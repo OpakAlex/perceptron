@@ -4,19 +4,66 @@ class Perceptron
 
   attr_accessor  :threshold, :inputs
 
-  def initialize inputs, weights
-    @inputs = inputs
-    @neurons = weights.map do |w|
-      Neuron.new(w)
+  #n - число нейронов
+  #m - число входов каждого нейрона скрытого слоя
+
+  def initialize n, m
+    @n = n
+    @m = m
+    @n.times do |w|
+      @neurons << Neuron.new(m)
     end
   end
 
-  def output
-      val = @inputs.zip(@neurons.map(&:w)).inject(0) { |total, i|
-        total + i[0] * i[1]
-      }
-      val < @threshold ? false: true
+  #Распознавание образа
+  # x - входной вектор
+  # return - выходной образ
+
+  def recognize x
+     y = []
+     @neurons.each_with_index do |neuron, i|
+       y[i] = neuron.transfer(x)
+     end
+     y
+  end
+
+  #
+  # Инициализация начальных весов
+  # малым случайным значением
+
+  def initWeights
+    @neurons.each(&:initWeights)
+  end
+
+  # Обучение перцептрона
+  # param x - входной вектор
+  # param y - правильный выходной вектор
+
+  def teach(x, y)
+    d = 0
+    v = 1 # скорость обучения
+    t = recognize(x)
+    while !equal(t, y) do
+      #подстройка весов каждого нейрона
+      neurons.each_with_index do |neuron, i|
+        d = y[i] - t[i]
+        neuron.changeWeights(v, d, x)
+      end
+      t = recognize(x)
     end
+  end
+
+  # Сравнивание двух векторов
+  # a - первый вектор
+  # b - второй вектор
+
+   def equal(a, b)
+     return false if a.length != b.length
+     a.each_with_index do |obj, i|
+      return false if obj != b[i]
+     end
+     true
+   end
 end
 
 class Neuron
@@ -40,7 +87,7 @@ class Neuron
     x.each.inject(0){ |total, i| nec + x[i] * @w[i] }
   end
 
-  def init_weights n
+  def init_weights n=10
     rand = Random.new
     @count.times do |i|
       @w[i] = rand(n)
