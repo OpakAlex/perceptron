@@ -2,7 +2,7 @@
 
 class Perceptron
 
-  attr_accessor  :threshold, :inputs
+  attr_accessor  :m, :n, :neurons
 
   #n - число нейронов
   #m - число входов каждого нейрона скрытого слоя
@@ -10,6 +10,7 @@ class Perceptron
   def initialize n, m
     @n = n
     @m = m
+    @neurons = []
     @n.times do |w|
       @neurons << Neuron.new(m)
     end
@@ -31,8 +32,8 @@ class Perceptron
   # Инициализация начальных весов
   # малым случайным значением
 
-  def initWeights
-    @neurons.each(&:initWeights)
+  def init_weights
+    @neurons.each(&:init_weights)
   end
 
   # Обучение перцептрона
@@ -45,9 +46,9 @@ class Perceptron
     t = recognize(x)
     while !equal(t, y) do
       #подстройка весов каждого нейрона
-      neurons.each_with_index do |neuron, i|
+      @neurons.each_with_index do |neuron, i|
         d = y[i] - t[i]
-        neuron.changeWeights(v, d, x)
+        neuron.change_weights(v, d, x)
       end
       t = recognize(x)
     end
@@ -84,7 +85,11 @@ class Neuron
   #x - входной вектор
   #return - невзвешенная сумма nec (биас не используется)
   def adder(x)
-    x.each.inject(0){ |total, i| nec + x[i] * @w[i] }
+    total = 0
+    x.each_with_index do |obj, i|
+      total = total + obj * @w[i]
+    end
+    total
   end
 
   def init_weights n=10
@@ -109,14 +114,15 @@ class Neuron
   #имеющая область значений {0;1}
   # nec - выход сумматора
 
-  def activator(nec)
+  def activator nec
     nec >= @s ?  1 : 0
   end
 
 end
 
-# Neuron.new(4).init_weights(10)
-
-# perc = Perceptron.new [1, 1, 1, 0], [1, 0, 1, 1]
-# perc.threshold = 2
-# puts perc.output
+perc = Perceptron.new 3, 3
+perc.init_weights()
+perc.teach([1,1,1], [0, 1, 0])
+perc.teach([1,1,1], [0, 1, 0])
+perc.teach([1,1,1], [0, 1, 0])
+puts perc.recognize([1,1,1])
