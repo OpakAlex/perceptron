@@ -63,7 +63,7 @@ class Neuron
   # nec - выход сумматора
 
   def activator(nec)
-    nec >= s ?  1 : 0
+    nec >= @s ?  1 : 0
   end
 
 end
