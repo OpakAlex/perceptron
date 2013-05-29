@@ -44,7 +44,8 @@ class Perceptron
     d = 0
     v = 1 # скорость обучения
     t = recognize(x)
-    while !equal(t, y) do
+    loop do
+     break if equal(t, y)
       #подстройка весов каждого нейрона
       @neurons.each_with_index do |neuron, i|
         d = y[i] - t[i]
@@ -122,7 +123,5 @@ end
 
 perc = Perceptron.new 3, 3
 perc.init_weights()
-perc.teach([1,1,1], [0, 1, 0])
-perc.teach([1,1,1], [0, 1, 0])
 perc.teach([1,1,1], [0, 1, 0])
 puts perc.recognize([1,1,1])
